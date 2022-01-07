@@ -9,31 +9,38 @@
  */
 namespace Fit\UI\Console;
 
+use Exception;
+use Fit\Fit;
 use Fit\UI\Application;
+use Fit\UI\Console\Command\TestCommand;
+use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Command\HelpCommand;
+use Symfony\Component\Console\Command\ListCommand;
 
 /**
  * The main entry-point for the console application.
  */
-final class ConsoleApplication implements Application
+final class ConsoleApplication extends BaseApplication implements Application
 {
-    /**
-     * @inheritDoc
-     */
-    public static function main(): void
-    {
-        $application = new ConsoleApplication();
+	public function __construct()
+	{
+		parent::__construct(Fit::getName(), Fit::getVersion());
+	}
 
-        $application->run($_SERVER['argv']);
+	/**
+	 * @inheritDoc
+	 * @throws Exception When running fails. Bypass this when {@link setCatchExceptions()}.
+	 */
+    public static function main(): int
+    {
+        return (new ConsoleApplication())->run();
     }
 
-    /**
-     * Runs the console application with the given arguments.
-     *
-     * @param array $arguments The arguments passed to the console application
-     * @return void
-     */
-    private function run(array $arguments): void
-    {
-
-    }
+	/**
+	 * @inheritDoc
+	 */
+	protected function getDefaultCommands(): array
+	{
+		return [new TestCommand(), new HelpCommand(), new ListCommand()];
+	}
 }

@@ -7,17 +7,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Fit\UI;
+namespace Fit\Config\Exception;
+
+use Exception;
 
 /**
- * The main entry-point of the application.
+ * Thrown when an invalid or unknown option is requested.
  */
-interface Application
+class InvalidOptionException extends Exception
 {
-    /**
-     * The main entry-point of the application.
-     *
-     * @return int The exit code of the application.
-     */
-    public static function main(): int;
 }

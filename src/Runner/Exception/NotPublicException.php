@@ -7,17 +7,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Fit\UI;
+namespace Fit\Runner\Exception;
+
+use Exception;
 
 /**
- * The main entry-point of the application.
+ * This exception is thrown when a method annotated with TestCase is not public.
  */
-interface Application
+class NotPublicException extends Exception
 {
-    /**
-     * The main entry-point of the application.
-     *
-     * @return int The exit code of the application.
-     */
-    public static function main(): int;
 }
