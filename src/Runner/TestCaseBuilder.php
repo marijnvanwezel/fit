@@ -10,7 +10,9 @@
 namespace Fit\Runner;
 
 use Fit\Framework\TestCase;
-use ReflectionException;
+use Fit\Runner\Exception\AbstractMethodException;
+use Fit\Runner\Exception\MethodNotPublicException;
+use Generator;
 use ReflectionMethod;
 
 /**
@@ -19,33 +21,47 @@ use ReflectionMethod;
 class TestCaseBuilder
 {
 	/**
-	 * Builds a TestCase from the given ReflectionMethod.
+	 * Builds a set of TestCases from the given iterable of ReflectionMethods.
 	 *
-	 * @param ReflectionMethod $reflectionMethod The ReflectionMethod to build a TestCase from
-	 * @return TestCase
-	 * @throws ReflectionException When the method's declaring class cannot be instantiated
+	 * @param iterable<ReflectionMethod> $methodIterator The iterator to build the TestCases from
+	 * @param object $fixture The fixture of the TestCases
+	 * @return Generator<TestCase>
+	 *
+	 * @throws AbstractMethodException
+	 * @throws MethodNotPublicException
 	 */
-	public function buildFromMethod(ReflectionMethod $reflectionMethod): TestCase
+	public function buildFromReflectionMethodIterable(iterable $methodIterator, object $fixture): Generator
 	{
-		$this->validOrThrow($reflectionMethod);
-
-		$declaringClass = $reflectionMethod->getDeclaringClass();
-		$classInstance = $declaringClass->newInstance();
-
-		$closure = $reflectionMethod->getClosure($classInstance);
+		foreach ($methodIterator as $method) {
+			yield $this->buildFromReflectionMethod($method, $fixture);
+		}
 	}
 
 	/**
-	 * Determines whether the given ReflectionMethod can form a valid TestCase. Throws an exception if
-	 * and only if this it not the case.
+	 * Builds a TestCase from the given ReflectionMethod.
 	 *
-	 * @param ReflectionMethod $reflectionMethod
-	 * @return void
+	 * @param ReflectionMethod $reflectionMethod The ReflectionMethod to build a TestCase from
+	 * @param object $fixture The fixture of the TestCase
+	 * @return TestCase
+	 *
+	 * @throws MethodNotPublicException When the given method is not public
+	 * @throws AbstractMethodException When the given method is abstract
 	 */
-	private function validOrThrow(ReflectionMethod $reflectionMethod): void
+	public function buildFromReflectionMethod(ReflectionMethod $reflectionMethod, object $fixture): TestCase
 	{
-		if (!$reflectionMethod->isPublic()) {
+		$className = $reflectionMethod->getDeclaringClass()->getName();
+		$methodName = $reflectionMethod->getName();
 
+		if (!$reflectionMethod->isPublic()) {
+			throw new MethodNotPublicException('The test-method "' . $className . '::' . $methodName .
+				'" cannot not be executed because it is not public.');
 		}
+
+		if ($reflectionMethod->isAbstract()) {
+			throw new AbstractMethodException('The test-method "' . $className . '::' . $methodName .
+				'" cannot be executed because it is abstract.');
+		}
+
+		return new TestCase($methodName, $reflectionMethod->getClosure($fixture));
 	}
 }

@@ -9,22 +9,22 @@
  */
 namespace Fit\Runner\Filter;
 
-use Fit\Attributes\Test;
+use Fit\Attributes\TestSuite as TestSuiteAttribute;
 use Iterator;
 
 /**
  * Filter implementation that filters Reflection* classes based on whether they have
- * the Test attribute.
+ * the TestSuite attribute.
  *
  * @internal This class is not covered by the backward compatibility promise for Fit.
  */
-class TestAttributeFilter extends AttributeFilter
+class TestSuiteAttributeFilter extends AttributeFilter
 {
 	/**
 	 * @inheritDoc
 	 */
 	public function __construct(array|Iterator $arrayOrIterator)
 	{
-		parent::__construct(Test::class, $arrayOrIterator);
+		parent::__construct(TestSuiteAttribute::class, $arrayOrIterator);
 	}
 }

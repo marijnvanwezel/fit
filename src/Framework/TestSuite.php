@@ -9,21 +9,60 @@
  */
 namespace Fit\Framework;
 
+use Closure;
+use Generator;
+
 /**
  * This class represents a set of test cases that share the same fixture.
  */
 class TestSuite
 {
 	/**
-	 * @var TestCase[] The test cases in this suite
+	 * @var Generator<TestCase> The test cases in this TestSuite
 	 */
-	private readonly array $testCases;
+	private readonly Generator $testCases;
 
 	/**
-	 * @param TestCase[] $testCases The test cases in this suite
+	 * @var Closure The setUp method to call before each test case
 	 */
-	public function __construct(array $testCases)
+	private readonly Closure $setUp;
+
+	/**
+	 * @var Closure The tearDown method to call after each test case
+	 */
+	private readonly Closure $tearDown;
+
+	/**
+	 * @param Generator<TestCase> $testCases The test cases in this suite
+	 */
+	public function __construct(Generator $testCases)
 	{
 		$this->testCases = $testCases;
+	}
+
+	/**
+	 * Set the setUp closure for this TestSuite.
+	 *
+	 * @note This function changes a readonly attribute and may only be called once.
+	 *
+	 * @param Closure $setUp The setUp method for this TestSuite
+	 * @return void
+	 */
+	public function setSetUp(Closure $setUp): void
+	{
+		$this->setUp = $setUp;
+	}
+
+	/**
+	 * Set the tearDown closure for this TestSuite.
+	 *
+	 * @note This function changes a readonly attribute and may only be called once.
+	 *
+	 * @param Closure $tearDown The tearDown method for this TestSuite
+	 * @return void
+	 */
+	public function setTearDown(Closure $tearDown): void
+	{
+		$this->tearDown = $tearDown;
 	}
 }

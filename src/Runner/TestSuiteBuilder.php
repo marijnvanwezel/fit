@@ -11,9 +11,11 @@ namespace Fit\Runner;
 
 use Fit\Framework\TestSuite;
 use Fit\Runner\Filesystem\Pathspec;
-use Fit\Runner\Filter\TestAttributeFilter;
+use Fit\Runner\Filter\TestCaseAttributeFilter;
+use Fit\Runner\Filter\TestSuiteAttributeFilter;
 use Generator;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionMethod;
 
 /**
@@ -22,20 +24,24 @@ use ReflectionMethod;
 class TestSuiteBuilder
 {
 	private FileReflector $fileReflector;
+	private TestCaseBuilder $testCaseBuilder;
 
 	/**
 	 * @param FileReflector $fileReflector
+	 * @param TestCaseBuilder $testCaseBuilder
 	 */
 	public function __construct(FileReflector $fileReflector, TestCaseBuilder $testCaseBuilder)
 	{
 		$this->fileReflector = $fileReflector;
+		$this->testCaseBuilder = $testCaseBuilder;
 	}
 
 	/**
-	 * Builds the TestSuite
+	 * Builds a set of TestSuites from the given Pathspec.
 	 *
 	 * @param Pathspec $pathspec
-	 * @return Generator
+	 * @return Generator<TestSuite>
+	 *
 	 * @throws Filesystem\Exception\PathspecException
 	 * @throws Exception\UnreadableFileException
 	 */
@@ -45,7 +51,7 @@ class TestSuiteBuilder
 
 		foreach ($files as $file) {
 			$fileClasses = $this->fileReflector->load($file);
-			$testClasses = new TestAttributeFilter($fileClasses);
+			$testClasses = new TestSuiteAttributeFilter($fileClasses);
 
 			foreach ($testClasses as $testClass) {
 				yield $this->buildFromClass($testClass);
@@ -61,14 +67,16 @@ class TestSuiteBuilder
 	 */
 	public function buildFromClass(ReflectionClass $reflectionClass): TestSuite
 	{
-		// Note to self: WE ONLY EVER WANT TO CONSTRUCT THE FIXTURE ONCE PER TEST SUITE, WHAT IS THE BEST PLACE FOR THIS?
-		$fixture = $reflectionClass->newInstance();
 		$classMethods = $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC);
+		$methodIterator = new TestCaseAttributeFilter($classMethods);
 
-		foreach ( $classMethods as $classMethod ) {
-			
-		}
+		$testCases = $this->testCaseBuilder->buildFromReflectionMethodIterable(
+			$methodIterator,
+			$reflectionClass->newInstance()
+		);
 
-		return new TestSuite($fixture, []);
+		$testSuite = new TestSuite($testCases);
+
+
 	}
 }

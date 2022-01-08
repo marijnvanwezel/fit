@@ -12,8 +12,8 @@ namespace Fit\Runner\Exception;
 use Exception;
 
 /**
- * This exception is thrown when a method annotated with TestCase is not public.
+ * This exception is thrown when a method annotated with TestCase is abstract.
  */
-class NotPublicException extends Exception
+class AbstractMethodException extends Exception
 {
 }

@@ -17,15 +17,22 @@ use Closure;
 class TestCase
 {
 	/**
-	 * @var Closure The test case to run
+	 * @var string The name of the test case
 	 */
-	private Closure $testCase;
+	private readonly string $name;
 
 	/**
+	 * @var Closure The test case to run
+	 */
+	private readonly Closure $testCase;
+
+	/**
+	 * @param string $name The name of the test case
 	 * @param Closure $testCase The test case to run
 	 */
-	public function __construct(Closure $testCase)
+	public function __construct(string $name, Closure $testCase)
 	{
+		$this->name = $name;
 		$this->testCase = $testCase;
 	}
 }

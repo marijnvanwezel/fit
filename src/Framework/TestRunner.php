@@ -22,12 +22,12 @@ class TestRunner
 	private readonly Generator $testSuites;
 
 	/**
-	 * Constructs a new TestRunner from the given TestSuite generator. We use a Generator for this for
-	 * performance and UX reasons.
+	 * Constructs a new TestRunner from the given TestSuite generator.
 	 *
-	 * In theory, a project can have millions of test suites, and we do not want to fill our memory with
-	 * millions of TestSuite objects. Furthermore, building TestSuite objects is relatively slow, and we
-	 * do not want to let the user wait for a (very) long time before actually running any tests.
+	 * We use a Generator for performance and UX reasons. In theory, a project can have millions of test
+	 * suites, and we do not want to fill our memory with millions of TestSuite objects. Furthermore,
+	 * building TestSuite objects is relatively slow, and we do not want to let the user wait for a (very)
+	 * long time before actually running any tests.
 	 *
 	 * @param Generator<TestSuite> $testSuites A generator of the test suites to run
 	 */
